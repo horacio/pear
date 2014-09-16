@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'pear'
+
+class PearOptionParser
+  def self.parse(args)
+    options_parser = OptionParser.new do |parser|
+      parser.on('-i',
+                '--init',
+                'Initialize Pear on the Git repository.') do
+        configuration = Pear::Configuration.new
+        configuration.write_sample_configuration
+
+        puts 'Writing sample configuration file... done.'
+      end
+
+      parser.on('-s',
+                '--start-session p1,p2,pN',
+                Array,
+                'Start pairing session.') do |pair|
+        pairing_session = Pear::PairingSession.new(participants: pair)
+        pairing_session.configure_repository
+
+        puts <<-MESSAGE
+Git has been reconfigured for your pairing session!
+Remember to run `pear -c` to end your pairing session.
+      MESSAGE
+      end
+
+      parser.on('-c',
+                '--clean',
+                'Clean leftovers from the Git repository.') do
+        runner = Pear::SystemRunner.new
+        runner.run("git config --remove-section user")
+
+        puts 'Done. Re-set your repository-specific user configuration at will.'
+      end
+
+      parser.on_tail('-v',
+                     '--version',
+                     'Shows current version.') do
+        puts Pear::VERSION
+      end
+
+      parser.on_tail('-h',
+                     '--help',
+                     'Shows this message.') do
+        puts parser
+      end
+    end
+
+    begin
+      options_parser.parse!(args)
+    rescue OptionParser::InvalidOption => invalid_option
+      puts invalid_option
+      abort('Please run `pear --help` to see the available commands.')
+    end
+  end
+end
+
+PearOptionParser.parse(ARGV)
