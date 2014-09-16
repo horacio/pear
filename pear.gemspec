@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Pear::VERSION
   spec.authors       = ["Horacio Bertorello"]
   spec.email         = ["syrii@msn.com"]
-  spec.summary       = %q{Pear is a simple pair-programmint tool for teams.}
+  spec.summary       = %q{Pear is a pair-programming command-line tool for Git.}
   spec.homepage      = "https://github.com/svankmajer/pear"
   spec.license       = "MIT"
 
