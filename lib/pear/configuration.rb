@@ -5,18 +5,11 @@ module Pear
     attr_reader :authors, :email
 
     def write_sample_configuration
-      abort('This doesn\'t look like a Git repository.') \
-        unless Dir.exists?('.git')
+      ensure_git_repository_exists
 
-      abort('Whoa there! A configuration file is already present.') \
-        if File.exists?('.pear.yml')
+      safeguard_pre_existing_configuration
 
-      File.write(CONFIG_FILE, <<-config)
-email: team@example.com
-authors:
-  - ad Alice Doe
-  - bd Bob Doe
-      config
+      File.write(CONFIG_FILE, sample_configuration)
     end
 
     def authors
@@ -35,6 +28,24 @@ authors:
 
     def configuration
       @configuration ||= YAML.load(File.open(CONFIG_FILE))
+    end
+
+    def sample_configuration
+      {
+        email: 'team@example.com',
+        authors: [
+          'ad Alice Doe',
+          'bd Bob Doe'
+        ]
+      }.to_yaml
+    end
+
+    def ensure_git_repository_exists
+      Dir.exists?('.git') or abort('This doesn\'t look like a Git repository.')
+    end
+
+    def safeguard_pre_existing_configuration
+      File.exists?('.pear.yml') and abort('Configuration file already exists!')
     end
   end
 
