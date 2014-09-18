@@ -22,10 +22,12 @@ class PearOptionParser
         pairing_session = Pear::PairingSession.new(participants: pair)
         pairing_session.configure_repository
 
-        puts <<-MESSAGE
-Git has been reconfigured for your pairing session!
-Remember to run `pear -c` to end your pairing session.
-      MESSAGE
+        if $?.success?
+          puts <<-MESSAGE.strip
+          Git has been reconfigured for your pairing session!
+          Remember to run `pear -c` to end your pairing session.
+          MESSAGE
+        end
       end
 
       parser.on('-c',
@@ -34,7 +36,9 @@ Remember to run `pear -c` to end your pairing session.
         runner = Pear::SystemRunner.new
         runner.run("git config --remove-section user")
 
-        puts 'Done. Re-set your repository-specific user configuration at will.'
+        if $?.success?
+          puts 'Done. Re-set your repository-specific configuration at will.'
+        end
       end
 
       parser.on_tail('-v',
